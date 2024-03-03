@@ -1,3 +1,6 @@
+from domain.error.domain_error import DomainError, DomainErrorType
+
+
 class Coordinate:
     def __init__(
         self,
@@ -5,10 +8,16 @@ class Coordinate:
         longitude: float,
     ):
         if not -90 <= latitude <= 90:
-            raise ValueError("Latitude must be between -90 and 90")
+            raise DomainError(
+                DomainErrorType.INVALID_LATITUDE,
+                "latitude is invalid",
+            )
 
         if not -180 <= longitude <= 180:
-            raise ValueError("Longitude must be between -180 and 180")
+            raise DomainError(
+                DomainErrorType.INVALID_LONGITUDE,
+                "longitude is invalid",
+            )
 
         self.__latitude = latitude
         self.__longitude = longitude
