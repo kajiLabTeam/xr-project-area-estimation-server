@@ -50,6 +50,9 @@ class SpotAggregateFactory:
         __spot_id = SpotAggregateId(ULID.from_str(id))
         __coordinate = Coordinate(latitude, longitude)
         __location_type = LocationType(location_type)
+        if id == "":
+            __spot_id = SpotAggregateId()
+
         return SpotAggregate(
             id=__spot_id,
             name=name,
