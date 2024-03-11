@@ -1,7 +1,7 @@
 from math import atan2, cos, radians, sin, sqrt
 from typing import List
 
-from config.const import EARTH_RADIUS, GENERATED_COORDINATES_NUM
+from config.const import EARTH_RADIUS, GENERATED_COORDINATES_NUM, PI
 from domain.model.spot.coordinate import Coordinate
 
 
@@ -30,21 +30,21 @@ class PeripheralCoordinates:
     ):
         # 角度を生成して、中心を中心にポイントを均等に分布させるポイント数を増やして、より均等に分布させる
         for i in range(GENERATED_COORDINATES_NUM):
-            angle = 2 * 3.141592653589793 * (i / GENERATED_COORDINATES_NUM)
+            angle = 2 * PI * (i / GENERATED_COORDINATES_NUM)
             dx = radius * cos(angle)
             dy = radius * sin(angle)
 
             # 新しい緯度と経度を計算する
             new_latitude = center_coordinate.get_latitude_of_private_value() + (
-                dy / 6371000
-            ) * (180 / 3.141592653589793)
+                dy / EARTH_RADIUS
+            ) * (180 / PI)
             new_longitude = center_coordinate.get_longitude_of_private_value() + (
                 dx
                 / (
-                    6371000
+                    EARTH_RADIUS
                     * cos(radians(center_coordinate.get_latitude_of_private_value()))
                 )
-            ) * (180 / 3.141592653589793)
+            ) * (180 / PI)
 
             self.add_peripheral_coordinate(Coordinate(new_latitude, new_longitude))
 
