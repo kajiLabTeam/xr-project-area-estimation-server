@@ -1,7 +1,7 @@
-from math import atan2, cos, radians, sin, sqrt
-from typing import List
+from math import asin, atan2, cos, degrees, radians, sin
+from typing import List, Tuple
 
-from config.const import EARTH_RADIUS, GENERATED_COORDINATES_NUM, PI
+from config.const import ANGLE_OF_CIRCLE, EARTH_RADIUS, ROUNDING_PRECISION
 from domain.model.spot.coordinate import Coordinate
 
 
@@ -24,46 +24,45 @@ class PeripheralCoordinates:
     def remove_peripheral_coordinate(self, peripheral_coordinate: Coordinate):
         self.peripheral_coordinate.remove(peripheral_coordinate)
 
-    # 中心座標と半径を受け取り、その中心座標を中心に半径内にある座標を生成する
+    def __calculate_point(
+        self, center_coordinate: Coordinate, radius: int, angle: float
+    ) -> Tuple[float, float]:
+        """
+        中心点、半径、方位角から円周上の点を計算します。
+        """
+
+        # 緯度と経度を度からラジアンに変換します
+        lat1 = radians(center_coordinate.get_latitude_of_private_value())
+        lon1 = radians(center_coordinate.get_longitude_of_private_value())
+        angular_distance = radius / EARTH_RADIUS
+
+        # 方位角を度からラジアンに変換します
+        angle = radians(angle)
+
+        lat2 = asin(
+            sin(lat1) * cos(angular_distance)
+            + cos(lat1) * sin(angular_distance) * cos(angle)
+        )
+        lon2 = lon1 + atan2(
+            sin(angle) * sin(angular_distance) * cos(lat1),
+            cos(angular_distance) - sin(lat1) * sin(lat2),
+        )
+
+        # ラジアンから度に緯度と経度を変換し、小数点第六位まで丸めます
+        lat2 = round(degrees(lat2), ROUNDING_PRECISION)
+        lon2 = round(degrees(lon2), ROUNDING_PRECISION)
+
+        return lat2, lon2
+
     def generate_coordinates_within_radius(
         self, center_coordinate: Coordinate, radius: int
     ):
-        # 角度を生成して、中心を中心にポイントを均等に分布させるポイント数を増やして、より均等に分布させる
-        for i in range(GENERATED_COORDINATES_NUM):
-            angle = 2 * PI * (i / GENERATED_COORDINATES_NUM)
-            dx = radius * cos(angle)
-            dy = radius * sin(angle)
-
-            # 新しい緯度と経度を計算する
-            new_latitude = center_coordinate.get_latitude_of_private_value() + (
-                dy / EARTH_RADIUS
-            ) * (180 / PI)
-            new_longitude = center_coordinate.get_longitude_of_private_value() + (
-                dx
-                / (
-                    EARTH_RADIUS
-                    * cos(radians(center_coordinate.get_latitude_of_private_value()))
-                )
-            ) * (180 / PI)
-
-            self.add_peripheral_coordinate(Coordinate(new_latitude, new_longitude))
-
-    # 2つの座標間の距離を計算する
-    # NOTE : このメソッドは現在使用されていませんが、将来的に使用する可能性があります
-    def calculate_distance(self, coord1: Coordinate, coord2: Coordinate) -> float:
-        # 2つの座標間の距離を計算するHaversineの公式
-        lat1, lon1 = radians(coord1.get_latitude_of_private_value()), radians(
-            coord1.get_longitude_of_private_value()
-        )
-        lat2, lon2 = radians(coord2.get_latitude_of_private_value()), radians(
-            coord2.get_longitude_of_private_value()
-        )
-
-        dlat = lat2 - lat1
-        dlon = lon2 - lon1
-
-        a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
-        c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-        distance = EARTH_RADIUS * c
-        return distance
+        """
+        中心座標と半径を受け取り、その中心座標を中心に半径内にある座標を生成する
+        """
+        # 15度ごとに360度まで繰り返す
+        for bearing in range(0, ANGLE_OF_CIRCLE, ANGLE_OF_CIRCLE):
+            lat, lon = self.__calculate_point(
+                center_coordinate=center_coordinate, radius=radius, angle=bearing
+            )
+            self.add_peripheral_coordinate(Coordinate(latitude=lat, longitude=lon))

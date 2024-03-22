@@ -37,8 +37,11 @@ class AreaAggregate:
         return self.__peripheral_coordinate
 
 
-# ファクトリ:特定の引数を受け取ってドメインオブジェクトを生成するメソッド
 class AreaAggregateFactory:
+    """
+    ファクトリ:特定の引数を受け取ってドメインオブジェクトを生成するメソッド
+    """
+
     @staticmethod
     def create(
         radius: int,

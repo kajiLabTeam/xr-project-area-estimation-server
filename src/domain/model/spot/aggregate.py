@@ -36,8 +36,11 @@ class SpotAggregate:
         return self.__coordinate
 
 
-# ファクトリ:特定の引数を受け取ってドメインオブジェクトを生成するメソッド
 class SpotAggregateFactory:
+    """
+    ファクトリ:特定の引数を受け取ってドメインオブジェクトを生成するメソッド
+    """
+
     @staticmethod
     def create(
         name: str,

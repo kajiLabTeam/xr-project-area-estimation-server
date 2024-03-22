@@ -31,7 +31,7 @@ class SpotItem(BaseModel):
 
 
 class GetSpotCollectionByAreaResponse(BaseModel):
-    spot: List[SpotItem]
+    spots: List[SpotItem]
 
 
 @router.post("/api/area/search", response_model=GetSpotCollectionByAreaResponse)
@@ -54,7 +54,7 @@ async def get_spot_by_spot_id_collection(
 
         # レスポンスボディを作成
         response = GetSpotCollectionByAreaResponse(
-            spot=[
+            spots=[
                 SpotItem(
                     id=str(spot.get_id_of_private_value().get_id_of_private_value()),
                     name=spot.get_name_of_private_value(),
