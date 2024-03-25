@@ -9,7 +9,7 @@ from domain.model.spot_collection.aggregate import SpotCollectionAggregate
 
 class SpotCollectionRepositoryImpl(metaclass=ABCMeta):
     @abstractmethod
-    def find_for_coordinates(
+    def find_for_coordinate_list(
         self,
         conn: connection,
         center_coordinate: Coordinate,
