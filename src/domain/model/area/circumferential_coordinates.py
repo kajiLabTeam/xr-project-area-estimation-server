@@ -1,34 +1,35 @@
 from math import asin, atan2, cos, degrees, radians, sin
 from typing import List, Tuple
 
-from config.const import ANGLE_OF_CIRCLE, EARTH_RADIUS, ROUNDING_PRECISION
+from config.const import (ANGLE_OF_CIRCLE, ANGLE_THRESHOLD, EARTH_RADIUS,
+                          ROUNDING_PRECISION)
 from domain.model.spot.coordinate import Coordinate
 
 
-class PeripheralCoordinates:
+class CircumferentialCoordinates:
     def __init__(
         self,
         radius: int,
         center_coordinate: Coordinate,
     ):
         self.peripheral_coordinate: List[Coordinate] = []
-        self.add_peripheral_coordinate(center_coordinate)
+        self.add_circumferential_coordinate(center_coordinate)
         self.generate_coordinates_within_radius(center_coordinate, radius)
 
     def get_peripheral_coordinate_of_private_value(self) -> List[Coordinate]:
         return self.peripheral_coordinate
 
-    def add_peripheral_coordinate(self, peripheral_coordinate: Coordinate):
-        self.peripheral_coordinate.append(peripheral_coordinate)
+    def add_circumferential_coordinate(self, circumferential_coordinate: Coordinate):
+        self.peripheral_coordinate.append(circumferential_coordinate)
 
-    def remove_peripheral_coordinate(self, peripheral_coordinate: Coordinate):
-        self.peripheral_coordinate.remove(peripheral_coordinate)
+    def remove_peripheral_coordinate(self, circumferential_coordinate: Coordinate):
+        self.peripheral_coordinate.remove(circumferential_coordinate)
 
     def __calculate_point(
         self, center_coordinate: Coordinate, radius: int, angle: float
     ) -> Tuple[float, float]:
         """
-        中心点、半径、方位角から円周上の点を計算します。
+        中心点、半径、方位角から円周上の点を計算する
         """
 
         # 緯度と経度を度からラジアンに変換します
@@ -60,9 +61,8 @@ class PeripheralCoordinates:
         """
         中心座標と半径を受け取り、その中心座標を中心に半径内にある座標を生成する
         """
-        # 15度ごとに360度まで繰り返す
-        for bearing in range(0, ANGLE_OF_CIRCLE, ANGLE_OF_CIRCLE):
+        for bearing in range(0, ANGLE_OF_CIRCLE, ANGLE_THRESHOLD):
             lat, lon = self.__calculate_point(
                 center_coordinate=center_coordinate, radius=radius, angle=bearing
             )
-            self.add_peripheral_coordinate(Coordinate(latitude=lat, longitude=lon))
+            self.add_circumferential_coordinate(Coordinate(latitude=lat, longitude=lon))

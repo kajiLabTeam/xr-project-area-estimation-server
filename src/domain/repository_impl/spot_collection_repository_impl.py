@@ -12,6 +12,7 @@ class SpotCollectionRepositoryImpl(metaclass=ABCMeta):
     def find_for_coordinates(
         self,
         conn: connection,
-        coordinates: List[Coordinate],
+        center_coordinate: Coordinate,
+        circumferential_coordinate_list: List[Coordinate],
     ) -> SpotCollectionAggregate:
         pass
